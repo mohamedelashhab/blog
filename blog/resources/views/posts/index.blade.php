@@ -19,7 +19,11 @@
   			<li><span><i class="glyphicon glyphicon-calendar"></i> {{$post->created_at->diffForHumans()}} </span></li>
             <li>|</li>
             <span><i class="glyphicon glyphicon-comment"></i> 
-                <p>comments</p>
+                <ul>
+                    @foreach ($post->comments as $comment)
+                        <li>{{$comment->body}}</li>
+                    @endforeach
+                </ul>
             </span>
 
 			</ul>

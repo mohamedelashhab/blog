@@ -14,7 +14,8 @@ class postsController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::with('comments')->get();
+        // dd($posts[0]->comments);
         return view('posts.index', compact('posts'));
     }
 
