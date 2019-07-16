@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\postsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,3 +15,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/posts', 'postsController@index')->name('posts.index');
