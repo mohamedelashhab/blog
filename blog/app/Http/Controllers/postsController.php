@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Post;
+use Illuminate\Support\Facades\Gate;
 
 class postsController extends Controller
 {
@@ -12,9 +13,15 @@ class postsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {
+        $this->middleware('auth')->only(['index', 'create', 'store']);
+    }
+
     public function index()
     {
-        $posts = Post::with('comments')->get();
+        $posts = Post::with('comments')->orderBy('created_at','DESC')->get();
         // dd($posts[0]->comments);
         return view('posts.index', compact('posts'));
     }
@@ -26,7 +33,8 @@ class postsController extends Controller
      */
     public function create()
     {
-        //
+
+        return view('posts.form');
     }
 
     /**
@@ -37,7 +45,16 @@ class postsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validPost = $request->validate([
+            'title' => 'required|max:25',
+            'body' => 'required|max:500'
+        ]);
+        $post = new \App\Post();
+        $post->title = $validPost['title'];
+        $post->body = $validPost['body'];
+        $post->user_id = $request->user()->id;
+        $post->save();
+        return redirect()->route('posts.index');
     }
 
     /**
@@ -59,7 +76,17 @@ class postsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $post = Post::findOrFail($id);
+
+        if(Gate::allows('update-post', $post))
+        {
+
+            return view('posts.form-edit', compact('post'));
+        }
+        else {
+            return redirect()->route('posts.index');
+        }
+        
     }
 
     /**
@@ -71,7 +98,23 @@ class postsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post = Post::findOrFail($id);
+        $validPost = $request->validate([
+            'title' => 'required|max:25',
+            'body' => 'required|max:500'
+        ]);
+        
+        if(Gate::allows('update-post', $post))
+        {
+            $post->title = $validPost['title'];
+            $post->body = $validPost['body'];
+            $post->save();
+            return redirect()->route('posts.index');
+        }
+        else {
+            return redirect()->route('posts.index');
+        }
+        
     }
 
     /**

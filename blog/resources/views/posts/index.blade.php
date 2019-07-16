@@ -29,6 +29,7 @@
 			</ul>
        </div>
     </div>
+<div><a href="{{route('posts.edit', $post->id)}}">Update</a></div>
   </div>
 
   @endforeach
